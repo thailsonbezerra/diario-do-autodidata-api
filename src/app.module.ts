@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { NotationModule } from './notation/notation.module';
+import { StatusSubjectModule } from './status-subject/status-subject.module';
+import { SubjectModule } from './subject/subject.module';
+import { TopicModule } from './topic/topic.module';
 
 @Module({
   imports: [
@@ -17,11 +21,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: process.env.DB_USERNAME,
       entities: [`${__dirname}/**/*.entity{.js,.ts}`],
       migrations: [`${__dirname}/migrations/{.ts,*.js}`],
-      synchronize: true,
+      synchronize: false,
       autoLoadEntities: true,
       migrationsRun: true,
     }),
     UserModule,
+    NotationModule,
+    StatusSubjectModule,
+    SubjectModule,
+    TopicModule,
   ],
   controllers: [],
   providers: [],

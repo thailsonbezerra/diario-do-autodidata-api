@@ -6,6 +6,7 @@ import { NotationModule } from './notation/notation.module';
 import { StatusSubjectModule } from './status-subject/status-subject.module';
 import { SubjectModule } from './subject/subject.module';
 import { TopicModule } from './topic/topic.module';
+import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { TopicModule } from './topic/topic.module';
     StatusSubjectModule,
     SubjectModule,
     TopicModule,
+    CacheModule,
   ],
   controllers: [],
   providers: [],

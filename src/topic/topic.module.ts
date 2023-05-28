@@ -3,10 +3,10 @@ import { TopicController } from './topic.controller';
 import { TopicService } from './topic.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TopicEntity } from './entity/topic.entity';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheModule } from 'src/cache/cache.module';
 
 @Module({
-  imports: [CacheModule.register(), TypeOrmModule.forFeature([TopicEntity])],
+  imports: [TypeOrmModule.forFeature([TopicEntity]), CacheModule],
   controllers: [TopicController],
   providers: [TopicService],
 })

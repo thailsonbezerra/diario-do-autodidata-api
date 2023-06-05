@@ -1,7 +1,12 @@
+import { TopicEntity } from 'src/topic/entity/topic.entity';
+import { UserEntity } from 'src/user/entity/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -28,4 +33,11 @@ export class SubjectEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @ManyToOne(() => UserEntity, (user) => user.subjects)
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  user: UserEntity;
+
+  @OneToMany(() => TopicEntity, (topic) => topic.subject)
+  topics: TopicEntity[];
 }

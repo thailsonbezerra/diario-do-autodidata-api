@@ -1,3 +1,4 @@
+import { ReturnSubjectDto } from 'src/subject/dtos/returnSubject.dto';
 import { UserEntity } from '../entity/user.entity';
 
 export class ReturnUserDto {
@@ -6,6 +7,7 @@ export class ReturnUserDto {
   email: string;
   cpf: string;
   created: Date;
+  subjects?: ReturnSubjectDto[];
 
   constructor(userEntity: UserEntity) {
     this.id = userEntity.id;
@@ -13,5 +15,9 @@ export class ReturnUserDto {
     this.email = userEntity.email;
     this.cpf = userEntity.cpf;
     this.created = userEntity.createdAt;
+
+    this.subjects = userEntity.subjects
+      ? userEntity.subjects.map((subject) => new ReturnSubjectDto(subject))
+      : undefined;
   }
 }

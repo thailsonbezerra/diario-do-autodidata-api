@@ -1,7 +1,10 @@
+import { SubjectEntity } from 'src/subject/entity/subject.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -25,4 +28,8 @@ export class TopicEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @ManyToOne(() => SubjectEntity, (subject) => subject.topics)
+  @JoinColumn({ name: 'subject_id', referencedColumnName: 'id' })
+  subject: SubjectEntity;
 }

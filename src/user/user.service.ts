@@ -46,7 +46,13 @@ export class UserService {
       where: {
         id: userId,
       },
-      relations: ['subjects'],
+      relations: {
+        subjects: {
+          topics: {
+            notations: true,
+          },
+        },
+      },
     });
   }
 }

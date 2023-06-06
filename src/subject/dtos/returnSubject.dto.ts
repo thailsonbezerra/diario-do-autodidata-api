@@ -1,15 +1,18 @@
+import { ReturnTopicDto } from 'src/topic/dtos/returnTopic.dto';
 import { SubjectEntity } from '../entity/subject.entity';
 
 export class ReturnSubjectDto {
-  id: number;
   name: string;
   description: string;
   statusId: number;
+  topics?: ReturnTopicDto[];
 
-  constructor(subjectEntity: SubjectEntity) {
-    this.id = subjectEntity.id;
-    this.name = subjectEntity.name;
-    this.description = subjectEntity.description;
-    this.statusId = subjectEntity.statusId;
+  constructor(subject: SubjectEntity) {
+    this.name = subject.name;
+    this.description = subject.description;
+    this.statusId = subject.statusId;
+    this.topics = subject.topics
+      ? subject.topics.map((topic) => new ReturnTopicDto(topic))
+      : undefined;
   }
 }

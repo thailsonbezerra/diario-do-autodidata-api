@@ -1,3 +1,4 @@
+import { NotationEntity } from 'src/notation/entity/notation.entity';
 import { SubjectEntity } from 'src/subject/entity/subject.entity';
 import {
   Column,
@@ -5,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -32,4 +34,7 @@ export class TopicEntity {
   @ManyToOne(() => SubjectEntity, (subject) => subject.topics)
   @JoinColumn({ name: 'subject_id', referencedColumnName: 'id' })
   subject: SubjectEntity;
+
+  @OneToMany(() => NotationEntity, (notation) => notation.topic)
+  notations: NotationEntity[];
 }

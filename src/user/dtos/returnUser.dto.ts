@@ -9,15 +9,15 @@ export class ReturnUserDto {
   created: Date;
   subjects?: ReturnSubjectDto[];
 
-  constructor(userEntity: UserEntity) {
-    this.id = userEntity.id;
-    this.name = userEntity.name;
-    this.email = userEntity.email;
-    this.cpf = userEntity.cpf;
-    this.created = userEntity.createdAt;
+  constructor(user: UserEntity) {
+    this.id = user.id;
+    this.name = user.name;
+    this.email = user.email;
+    this.cpf = user.cpf;
+    this.created = user.createdAt;
 
-    this.subjects = userEntity.subjects
-      ? userEntity.subjects.map((subject) => new ReturnSubjectDto(subject))
+    this.subjects = user.subjects
+      ? user.subjects.map((subject) => new ReturnSubjectDto(subject))
       : undefined;
   }
 }

@@ -1,7 +1,10 @@
+import { TopicEntity } from 'src/topic/entity/topic.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -22,4 +25,8 @@ export class NotationEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @ManyToOne(() => TopicEntity, (topic) => topic.notations)
+  @JoinColumn({ name: 'topic_id', referencedColumnName: 'id' })
+  topic: TopicEntity;
 }

@@ -7,6 +7,7 @@ import { StatusSubjectModule } from './status-subject/status-subject.module';
 import { SubjectModule } from './subject/subject.module';
 import { TopicModule } from './topic/topic.module';
 import { CacheModule } from './cache/cache.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CacheModule } from './cache/cache.module';
     SubjectModule,
     TopicModule,
     CacheModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

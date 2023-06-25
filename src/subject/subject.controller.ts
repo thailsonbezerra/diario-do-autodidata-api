@@ -12,6 +12,8 @@ import { SubjectService } from './subject.service';
 import { SubjectEntity } from './entity/subject.entity';
 import { CreateSubjectDto } from './dtos/createSubject.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { UserLogado } from 'src/decorators/user-logado.decorator';
+import { LoginPayload } from 'src/auth/dtos/loginPayload.dto';
 
 const STATUS_SUBJECT_INICIAL = 1;
 
@@ -20,16 +22,16 @@ const STATUS_SUBJECT_INICIAL = 1;
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 
-  @Post('/:userId')
+  @Post()
   @UsePipes(ValidationPipe)
   async createSubject(
     @Body() createSubject: CreateSubjectDto,
-    @Param('userId') userId: number,
+    @UserLogado() userLogado: LoginPayload,
   ): Promise<SubjectEntity> {
     return this.subjectService.create(
       createSubject,
       STATUS_SUBJECT_INICIAL,
-      userId,
+      userLogado.id,
     );
   }
 

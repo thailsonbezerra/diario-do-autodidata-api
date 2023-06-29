@@ -1,5 +1,5 @@
-import { NotationEntity } from 'src/notation/entity/notation.entity';
-import { SubjectEntity } from 'src/subject/entity/subject.entity';
+import { NotationEntity } from '../../notation/entity/notation.entity';
+import { SubjectEntity } from '../../subject/entity/subject.entity';
 import {
   Column,
   CreateDateColumn,

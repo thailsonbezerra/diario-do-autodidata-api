@@ -1,4 +1,4 @@
-import { ReturnNotationDto } from 'src/notation/dtos/returnNotation.dto';
+import { ReturnNotationDto } from '../../notation/dtos/returnNotation.dto';
 import { TopicEntity } from '../entity/topic.entity';
 
 export class ReturnTopicDto {

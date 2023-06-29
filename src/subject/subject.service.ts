@@ -3,7 +3,7 @@ import { SubjectEntity } from './entity/subject.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSubjectDto } from './dtos/createSubject.dto';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class SubjectService {

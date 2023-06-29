@@ -1,4 +1,4 @@
-import { ReturnTopicDto } from 'src/topic/dtos/returnTopic.dto';
+import { ReturnTopicDto } from '../../topic/dtos/returnTopic.dto';
 import { SubjectEntity } from '../entity/subject.entity';
 
 export class ReturnSubjectDto {

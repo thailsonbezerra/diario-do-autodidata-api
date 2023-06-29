@@ -1,4 +1,4 @@
-import { TopicEntity } from 'src/topic/entity/topic.entity';
+import { TopicEntity } from '../../topic/entity/topic.entity';
 import {
   Column,
   CreateDateColumn,

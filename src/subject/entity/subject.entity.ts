@@ -1,5 +1,5 @@
-import { TopicEntity } from 'src/topic/entity/topic.entity';
-import { UserEntity } from 'src/user/entity/user.entity';
+import { TopicEntity } from '../../topic/entity/topic.entity';
+import { UserEntity } from '../../user/entity/user.entity';
 import {
   Column,
   CreateDateColumn,

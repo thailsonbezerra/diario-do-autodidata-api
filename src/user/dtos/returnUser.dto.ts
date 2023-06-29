@@ -1,4 +1,4 @@
-import { ReturnSubjectDto } from 'src/subject/dtos/returnSubject.dto';
+import { ReturnSubjectDto } from '../../subject/dtos/returnSubject.dto';
 import { UserEntity } from '../entity/user.entity';
 
 export class ReturnUserDto {

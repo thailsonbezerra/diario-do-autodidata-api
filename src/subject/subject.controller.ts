@@ -12,8 +12,8 @@ import { SubjectService } from './subject.service';
 import { SubjectEntity } from './entity/subject.entity';
 import { CreateSubjectDto } from './dtos/createSubject.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { UserLogado } from 'src/decorators/user-logado.decorator';
-import { LoginPayload } from 'src/auth/dtos/loginPayload.dto';
+import { UserLogado } from '../decorators/user-logado.decorator';
+import { LoginPayload } from '../auth/dtos/loginPayload.dto';
 
 const STATUS_SUBJECT_INICIAL = 1;
 

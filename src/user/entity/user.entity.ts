@@ -1,4 +1,4 @@
-import { SubjectEntity } from 'src/subject/entity/subject.entity';
+import { SubjectEntity } from '../../subject/entity/subject.entity';
 import {
   Column,
   CreateDateColumn,
@@ -32,5 +32,5 @@ export class UserEntity {
   updatedAt: Date;
 
   @OneToMany(() => SubjectEntity, (subject) => subject.user)
-  subjects: SubjectEntity[];
+  subjects?: SubjectEntity[];
 }

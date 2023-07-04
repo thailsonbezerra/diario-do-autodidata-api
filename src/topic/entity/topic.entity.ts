@@ -33,8 +33,8 @@ export class TopicEntity {
 
   @ManyToOne(() => SubjectEntity, (subject) => subject.topics)
   @JoinColumn({ name: 'subject_id', referencedColumnName: 'id' })
-  subject: SubjectEntity;
+  subject?: SubjectEntity;
 
   @OneToMany(() => NotationEntity, (notation) => notation.topic)
-  notations: NotationEntity[];
+  notations?: NotationEntity[];
 }

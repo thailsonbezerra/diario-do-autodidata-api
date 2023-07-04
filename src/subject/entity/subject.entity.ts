@@ -36,8 +36,8 @@ export class SubjectEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.subjects)
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-  user: UserEntity;
+  user?: UserEntity;
 
   @OneToMany(() => TopicEntity, (topic) => topic.subject)
-  topics: TopicEntity[];
+  topics?: TopicEntity[];
 }

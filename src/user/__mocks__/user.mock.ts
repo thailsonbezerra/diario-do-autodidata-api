@@ -7,5 +7,5 @@ export const userEntityMock: UserEntity = {
   email: 'emailmock@email.com',
   id: 8930,
   name: 'nameMock',
-  password: 'largePassword',
+  password: '$2b$10$9N8XP82IVFHqHw3aiMRM3exn6kTsUBZ9n.b3Jh6DY4h5E/XoCNcuO',
 };

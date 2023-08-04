@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { SubjectEntity } from 'src/subject/entity/subject.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'status_subject' })
 export class StatusSubjectEntity {
@@ -10,4 +11,7 @@ export class StatusSubjectEntity {
 
   @Column({ name: 'color', nullable: false })
   color: string;
+
+  @OneToMany(() => SubjectEntity, (subject) => subject.status)
+  subject?: SubjectEntity;
 }

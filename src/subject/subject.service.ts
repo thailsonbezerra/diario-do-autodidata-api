@@ -1,6 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { SubjectEntity } from './entity/subject.entity';
-import { Raw, Repository } from 'typeorm';
+import { EntityNotFoundError, Raw, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSubjectDto } from './dtos/createSubject.dto';
 import { UserService } from '../user/user.service';
@@ -52,11 +57,31 @@ export class SubjectService {
     });
   }
 
-  async getById(id: number): Promise<SubjectEntity> {
-    return await this.subjectRepository.findOne({
-      where: {
-        id,
-      },
-    });
+  async getByIdUsingRelations(
+    id: number,
+    userId: number,
+  ): Promise<SubjectEntity> {
+    try {
+      return await this.subjectRepository.findOneOrFail({
+        where: {
+          id,
+          userId,
+        },
+        relations: {
+          topics: {
+            notations: true,
+          },
+          status: true,
+        },
+      });
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        throw new HttpException(
+          'Subject not found for this user',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+      throw error;
+    }
   }
 }

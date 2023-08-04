@@ -15,13 +15,18 @@ import { CreateSubjectDto } from './dtos/createSubject.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UserLogado } from '../decorators/user-logado.decorator';
 import { LoginPayload } from '../auth/dtos/loginPayload.dto';
+import { returnAllFromSubject } from './dtos/returnAllFromSubject';
+import { StatusSubjectService } from '../status-subject/status-subject.service';
 
 const STATUS_SUBJECT_INICIAL = 1;
 
 @Controller('subject')
 @UseGuards(AuthGuard('jwt'))
 export class SubjectController {
-  constructor(private readonly subjectService: SubjectService) {}
+  constructor(
+    private readonly subjectService: SubjectService,
+    private readonly statusSubjectService: StatusSubjectService,
+  ) {}
 
   @Post()
   @UsePipes(ValidationPipe)
@@ -52,7 +57,18 @@ export class SubjectController {
   }
 
   @Get('/:subjectId')
-  async getSubjectById(@Param('subjectId') subjectId: number) {
-    return await this.subjectService.getById(subjectId);
+  async getAllFromSubjectById(
+    @UserLogado() userLogado: LoginPayload,
+    @Param('subjectId') subjectId: number,
+  ) {
+    const subject = await this.subjectService.getByIdUsingRelations(
+      +subjectId,
+      userLogado.id,
+    );
+
+    return {
+      ...new returnAllFromSubject(subject),
+      situation: subject.status.name,
+    };
   }
 }

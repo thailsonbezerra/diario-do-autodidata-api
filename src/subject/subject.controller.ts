@@ -16,17 +16,13 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserLogado } from '../decorators/user-logado.decorator';
 import { LoginPayload } from '../auth/dtos/loginPayload.dto';
 import { returnAllFromSubject } from './dtos/returnAllFromSubject';
-import { StatusSubjectService } from '../status-subject/status-subject.service';
 
 const STATUS_SUBJECT_INICIAL = 1;
 
 @Controller('subject')
 @UseGuards(AuthGuard('jwt'))
 export class SubjectController {
-  constructor(
-    private readonly subjectService: SubjectService,
-    private readonly statusSubjectService: StatusSubjectService,
-  ) {}
+  constructor(private readonly subjectService: SubjectService) {}
 
   @Post()
   @UsePipes(ValidationPipe)

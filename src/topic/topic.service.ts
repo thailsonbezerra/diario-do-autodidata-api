@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TopicEntity } from './entity/topic.entity';
 import { Repository } from 'typeorm';
 import { CacheService } from '../cache/cache.service';
+import { CreateTopicDto } from './dtos/createTopicDto';
 
 @Injectable()
 export class TopicService {
@@ -17,5 +18,9 @@ export class TopicService {
       `subject_${subjectId}`,
       () => this.topicRepository.find({ where: { subjectId } }),
     );
+  }
+
+  async createBySubjectId(createTopic: CreateTopicDto): Promise<TopicEntity> {
+    return await this.topicRepository.save(createTopic);
   }
 }

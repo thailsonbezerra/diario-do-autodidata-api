@@ -1,15 +1,10 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { SubjectEntity } from './entity/subject.entity';
-import { EntityNotFoundError, Raw, Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSubjectDto } from './dtos/createSubject.dto';
 import { UserService } from '../user/user.service';
-import { handleOptionalFilterDate } from 'src/helpers/handleOptionalFilterDate';
+import { handleOptionalFilterDate } from '../utils/handleOptionalFilterDate';
 
 @Injectable()
 export class SubjectService {

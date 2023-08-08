@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TopicEntity } from './entity/topic.entity';
 import { Repository } from 'typeorm';
@@ -22,5 +22,19 @@ export class TopicService {
 
   async createBySubjectId(createTopic: CreateTopicDto): Promise<TopicEntity> {
     return await this.topicRepository.save(createTopic);
+  }
+
+  async getById(id: number) {
+    const topic = await this.topicRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!topic) {
+      throw new NotFoundException(`TopicId: ${id} Not Found`);
+    }
+
+    return topic;
   }
 }

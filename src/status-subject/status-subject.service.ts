@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StatusSubjectEntity } from './entity/status-subject.entity';
@@ -11,10 +11,16 @@ export class StatusSubjectService {
   ) {}
 
   async getNameStatusById(statusId: number) {
-    return await this.statusSubjectRepository.findOne({
+    const status = await this.statusSubjectRepository.findOne({
       where: {
         id: statusId,
       },
     });
+
+    if (!status) {
+      throw new NotFoundException(`SubjectId: ${statusId} Not Found`);
+    }
+
+    return status;
   }
 }

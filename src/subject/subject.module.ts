@@ -14,5 +14,6 @@ import { StatusSubjectModule } from '../status-subject/status-subject.module';
   ],
   controllers: [SubjectController],
   providers: [SubjectService],
+  exports: [SubjectService],
 })
 export class SubjectModule {}

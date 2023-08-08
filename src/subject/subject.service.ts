@@ -58,30 +58,34 @@ export class SubjectService {
   }
 
   async getByIdUsingRelations(
-    id: number,
+    subjectId: number,
     userId: number,
   ): Promise<SubjectEntity> {
-    try {
-      return await this.subjectRepository.findOneOrFail({
-        where: {
-          id,
-          userId,
+    const subject = await this.subjectRepository.findOne({
+      where: {
+        id: subjectId,
+        userId,
+      },
+      relations: {
+        topics: {
+          notations: true,
         },
-        relations: {
-          topics: {
-            notations: true,
-          },
-          status: true,
-        },
-      });
-    } catch (error) {
-      if (error instanceof EntityNotFoundError) {
-        throw new HttpException(
-          'Subject not found for this user',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-      throw error;
+        status: true,
+      },
+    });
+
+    if (!subject) {
+      throw new NotFoundException(`SubjectId: ${subjectId} Not Found`);
     }
+
+    return subject;
+  }
+
+  async getById(id: number) {
+    return await this.subjectRepository.findOne({
+      where: {
+        id,
+      },
+    });
   }
 }

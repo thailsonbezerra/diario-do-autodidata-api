@@ -14,8 +14,12 @@ export class NotationController {
   @Post()
   async createTopicNotation(
     @Body() createNotation: CreateNotationDto,
+    @UserLogado() userLogado: LoginPayload,
   ): Promise<NotationEntity> {
-    return await this.notationService.createByTopicId(createNotation);
+    return await this.notationService.createByTopicId(
+      createNotation,
+      +userLogado.id,
+    );
   }
 
   @Get('/:topicId')

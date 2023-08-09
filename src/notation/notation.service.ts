@@ -17,7 +17,22 @@ export class NotationService {
 
   async createByTopicId(
     createNotation: CreateNotationDto,
+    userId: number,
   ): Promise<NotationEntity> {
+    const { topicId } = createNotation;
+
+    const { subjectId } = await this.topicService.getById(topicId);
+
+    const subject = await this.subjectService.getById(subjectId);
+
+    const isUser = subject.userId === userId;
+
+    if (!isUser) {
+      throw new NotFoundException(
+        `Notation Not Found by TopidId: ${topicId} for that user`,
+      );
+    }
+
     return await this.notationRepository.save(createNotation);
   }
 

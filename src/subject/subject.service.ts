@@ -77,10 +77,16 @@ export class SubjectService {
   }
 
   async getById(id: number) {
-    return await this.subjectRepository.findOne({
+    const subject = await this.subjectRepository.findOne({
       where: {
         id,
       },
     });
+
+    if (!subject) {
+      throw new NotFoundException(`SubjectId: ${id} Not Found`);
+    }
+
+    return subject;
   }
 }

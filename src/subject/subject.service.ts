@@ -76,16 +76,20 @@ export class SubjectService {
     return subject;
   }
 
-  async getById(id: number) {
+  async getById(id: number, userId: number) {
     const subject = await this.subjectRepository.findOne({
       where: {
         id,
       },
     });
 
-    if (!subject) {
-      throw new NotFoundException(`SubjectId: ${id} Not Found`);
-    }
+    if (!subject) throw new NotFoundException(`SubjectId: ${id} Not Found`);
+
+    const isUser = subject.userId === userId;
+    if (!isUser)
+      throw new NotFoundException(
+        `Subject Not Found by SubjectId: ${id} for that user`,
+      );
 
     return subject;
   }

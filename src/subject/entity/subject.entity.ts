@@ -43,6 +43,6 @@ export class SubjectEntity {
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user?: UserEntity;
 
-  @OneToMany(() => TopicEntity, (topic) => topic.subject)
+  @OneToMany(() => TopicEntity, (topic) => topic.subject, { cascade: true })
   topics?: TopicEntity[];
 }

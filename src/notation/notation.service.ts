@@ -22,16 +22,7 @@ export class NotationService {
     const { topicId } = createNotation;
 
     const { subjectId } = await this.topicService.getById(topicId);
-
-    const subject = await this.subjectService.getById(subjectId);
-
-    const isUser = subject.userId === userId;
-
-    if (!isUser) {
-      throw new NotFoundException(
-        `Notation Not Found by TopidId: ${topicId} for that user`,
-      );
-    }
+    const subject = await this.subjectService.getById(subjectId, userId);
 
     return await this.notationRepository.save(createNotation);
   }
@@ -45,15 +36,7 @@ export class NotationService {
 
     const { subjectId } = await this.topicService.getById(topicId);
 
-    const subject = await this.subjectService.getById(subjectId);
-
-    const isUser = subject.userId === userId;
-
-    if (!isUser) {
-      throw new NotFoundException(
-        `Notation Not Found by TopidId: ${topicId} for that user`,
-      );
-    }
+    const subject = await this.subjectService.getById(subjectId, userId);
 
     return notation;
   }

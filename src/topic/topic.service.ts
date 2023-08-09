@@ -19,15 +19,7 @@ export class TopicService {
     subjectId: number,
     userId: number,
   ): Promise<TopicEntity[]> {
-    const subject = await this.subjectService.getById(subjectId);
-
-    const isUser = subject.userId === userId;
-
-    if (!isUser) {
-      throw new NotFoundException(
-        `Topic Not Found by SubjectId: ${subjectId} for that user`,
-      );
-    }
+    const subject = await this.subjectService.getById(subjectId, userId);
 
     return this.cacheService.getCache<TopicEntity[]>(
       `subject_${subjectId}`,
@@ -41,15 +33,8 @@ export class TopicService {
   ): Promise<TopicEntity> {
     const { subjectId } = createTopic;
 
-    const subject = await this.subjectService.getById(subjectId);
+    const subject = await this.subjectService.getById(subjectId, userId);
 
-    const isUser = subject.userId === userId;
-
-    if (!isUser) {
-      throw new NotFoundException(
-        `Topic Not Found by SubjectId: ${subjectId} for that user`,
-      );
-    }
     return await this.topicRepository.save(createTopic);
   }
 

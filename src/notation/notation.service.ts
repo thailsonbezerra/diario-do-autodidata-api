@@ -1,4 +1,10 @@
-import { HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
+import {
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotationEntity } from './entity/notation.entity';
@@ -54,5 +60,34 @@ export class NotationService {
     await this.subjectService.getById(subjectId, userId);
 
     return notation;
+  }
+
+  async getById(id: number, userId: number) {
+    const notation = await this.notationRepository.findOne({
+      where: { id },
+      relations: {
+        topic: {
+          subject: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!notation) {
+      throw new NotFoundException(`NotationId: ${id} Not Found`);
+    }
+
+    if (notation.topic.subject.userId !== userId) {
+      throw new NotFoundException(`NotationId: ${id} Not Found for that user`);
+    }
+
+    return notation;
+  }
+
+  async deleteById(id: number, userId: number) {
+    await this.getById(id, userId);
+
+    return await this.notationRepository.delete(id);
   }
 }

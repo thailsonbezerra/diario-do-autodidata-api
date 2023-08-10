@@ -22,14 +22,14 @@ export class NotationService {
   ): Promise<NotationEntity> {
     const { topicId } = createNotation;
 
-    const { subjectId } = await this.topicService.getById(topicId);
+    const { subjectId } = await this.topicService.getById(topicId, userId);
     await this.subjectService.getById(subjectId, userId);
 
     return await this.notationRepository.save(createNotation);
   }
 
   async deleteByTopicId(topicId: number, userId: number) {
-    const { subjectId } = await this.topicService.getById(topicId);
+    const { subjectId } = await this.topicService.getById(topicId, userId);
 
     await this.subjectService.getById(subjectId, userId);
 
@@ -49,7 +49,7 @@ export class NotationService {
       },
     });
 
-    const { subjectId } = await this.topicService.getById(topicId);
+    const { subjectId } = await this.topicService.getById(topicId, userId);
 
     await this.subjectService.getById(subjectId, userId);
 

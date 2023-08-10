@@ -59,10 +59,16 @@ export class TopicService {
     return await this.topicRepository.delete({ subjectId });
   }
 
-  async getById(id: number): Promise<TopicEntity> {
+  async getById(id: number, userId: number): Promise<TopicEntity> {
     const topic = await this.topicRepository.findOne({
       where: {
         id,
+      },
+      relations: {
+        notations: true,
+        subject: {
+          user: true,
+        },
       },
     });
 
@@ -70,6 +76,18 @@ export class TopicService {
       throw new NotFoundException(`TopicId: ${id} Not Found`);
     }
 
+    if (topic.subject.userId !== userId) {
+      throw new NotFoundException(`TopicId: ${id} Not Found for that user`);
+    }
+
     return topic;
+  }
+
+  async deleteById(id: number, userId: number) {
+    await this.getById(id, userId);
+
+    await this.notationService.deleteByTopicId(id, userId);
+
+    return await this.topicRepository.delete(id);
   }
 }

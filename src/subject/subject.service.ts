@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSubjectDto } from './dtos/createSubject.dto';
 import { UserService } from '../user/user.service';
 import { handleOptionalFilterDate } from '../utils/handleOptionalFilterDate';
+import { TopicService } from 'src/topic/topic.service';
 
 @Injectable()
 export class SubjectService {
@@ -12,6 +13,7 @@ export class SubjectService {
     @InjectRepository(SubjectEntity)
     private readonly subjectRepository: Repository<SubjectEntity>,
     private readonly userService: UserService,
+    private readonly topicService: TopicService,
   ) {}
 
   async createByUserId(
@@ -92,5 +94,13 @@ export class SubjectService {
       );
 
     return subject;
+  }
+
+  async deleteById(id: number, userId: number) {
+    await this.getById(id, userId);
+
+    await this.topicService.deleteBySubjectId(id, userId);
+
+    return await this.subjectRepository.delete(id);
   }
 }

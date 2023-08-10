@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotationEntity } from './entity/notation.entity';
@@ -11,8 +11,9 @@ export class NotationService {
   constructor(
     @InjectRepository(NotationEntity)
     private readonly notationRepository: Repository<NotationEntity>,
-    private readonly subjectService: SubjectService,
+    @Inject(forwardRef(() => TopicService))
     private readonly topicService: TopicService,
+    private readonly subjectService: SubjectService,
   ) {}
 
   async createByTopicId(
@@ -22,9 +23,23 @@ export class NotationService {
     const { topicId } = createNotation;
 
     const { subjectId } = await this.topicService.getById(topicId);
-    const subject = await this.subjectService.getById(subjectId, userId);
+    await this.subjectService.getById(subjectId, userId);
 
     return await this.notationRepository.save(createNotation);
+  }
+
+  async deleteByTopicId(topicId: number, userId: number) {
+    const { subjectId } = await this.topicService.getById(topicId);
+
+    await this.subjectService.getById(subjectId, userId);
+
+    const notations = await this.getAllNotationsByTopicId(topicId, userId);
+
+    for (const notation of notations) {
+      await this.notationRepository.delete({ id: notation.id });
+    }
+
+    return HttpStatus.OK;
   }
 
   async getAllNotationsByTopicId(topicId: number, userId: number) {
@@ -36,7 +51,7 @@ export class NotationService {
 
     const { subjectId } = await this.topicService.getById(topicId);
 
-    const subject = await this.subjectService.getById(subjectId, userId);
+    await this.subjectService.getById(subjectId, userId);
 
     return notation;
   }

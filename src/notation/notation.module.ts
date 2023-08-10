@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotationEntity } from './entity/notation.entity';
 import { NotationService } from './notation.service';
@@ -9,10 +9,11 @@ import { TopicModule } from 'src/topic/topic.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([NotationEntity]),
+    forwardRef(() => TopicModule),
     SubjectModule,
-    TopicModule,
   ],
   controllers: [NotationController],
   providers: [NotationService],
+  exports: [NotationService],
 })
 export class NotationModule {}

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -66,5 +67,13 @@ export class SubjectController {
       ...new returnAllFromSubject(subject),
       situation: subject.status.name,
     };
+  }
+
+  @Delete('/:subjectId')
+  async deleteUserSubjectById(
+    @Param('subjectId') subjectId: number,
+    @UserLogado() userLogado: LoginPayload,
+  ) {
+    return await this.subjectService.deleteById(+subjectId, +userLogado.id);
   }
 }

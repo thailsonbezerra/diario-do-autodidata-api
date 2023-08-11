@@ -11,6 +11,7 @@ import { NotationEntity } from './entity/notation.entity';
 import { CreateNotationDto } from './dtos/createNotationDto';
 import { SubjectService } from 'src/subject/subject.service';
 import { TopicService } from 'src/topic/topic.service';
+import { UpdateNotationDto } from './dtos/updateNotationDto';
 
 @Injectable()
 export class NotationService {
@@ -89,5 +90,18 @@ export class NotationService {
     await this.getById(id, userId);
 
     return await this.notationRepository.delete(id);
+  }
+
+  async updateById(
+    id: number,
+    userId: number,
+    updateNotation: UpdateNotationDto,
+  ) {
+    await this.getById(id, userId);
+
+    return await this.notationRepository.update(
+      { id },
+      { ...updateNotation, updatedAt: new Date() },
+    );
   }
 }

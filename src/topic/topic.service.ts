@@ -11,6 +11,7 @@ import { CacheService } from '../cache/cache.service';
 import { CreateTopicDto } from './dtos/createTopicDto';
 import { SubjectService } from '../subject/subject.service';
 import { NotationService } from 'src/notation/notation.service';
+import { UpdateTopicDto } from './dtos/updateTopicDto';
 
 @Injectable()
 export class TopicService {
@@ -89,5 +90,14 @@ export class TopicService {
     await this.notationService.deleteByTopicId(id, userId);
 
     return await this.topicRepository.delete(id);
+  }
+
+  async updateById(id: number, userId: number, updateTopic: UpdateTopicDto) {
+    await this.getById(id, userId);
+
+    return await this.topicRepository.update(
+      { id },
+      { ...updateTopic, updatedAt: new Date() },
+    );
   }
 }

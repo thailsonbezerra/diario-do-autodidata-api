@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -17,6 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserLogado } from '../decorators/user-logado.decorator';
 import { LoginPayload } from '../auth/dtos/loginPayload.dto';
 import { returnAllFromSubject } from './dtos/returnAllFromSubject';
+import { UpdateSubjectDto } from './dtos/updateSubjectdto';
 
 const STATUS_SUBJECT_INICIAL = 1;
 
@@ -75,5 +77,19 @@ export class SubjectController {
     @UserLogado() userLogado: LoginPayload,
   ) {
     return await this.subjectService.deleteById(+subjectId, +userLogado.id);
+  }
+
+  @UsePipes(ValidationPipe)
+  @Patch('/:id')
+  async updateById(
+    @UserLogado() userLogado: LoginPayload,
+    @Param('id') id: number,
+    @Body() updateSubjectDto: UpdateSubjectDto,
+  ) {
+    return await this.subjectService.updateById(
+      +id,
+      +userLogado.id,
+      updateSubjectDto,
+    );
   }
 }

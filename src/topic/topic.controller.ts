@@ -4,8 +4,11 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { TopicService } from './topic.service';
 import { TopicEntity } from './entity/topic.entity';
@@ -14,6 +17,7 @@ import { CreateTopicDto } from './dtos/createTopicDto';
 import { UserLogado } from 'src/decorators/user-logado.decorator';
 import { LoginPayload } from 'src/auth/dtos/loginPayload.dto';
 import { ReturnTopicDto } from './dtos/returnTopic.dto';
+import { UpdateTopicDto } from './dtos/updateTopicDto';
 
 @Controller('topic')
 @UseGuards(AuthGuard('jwt'))
@@ -58,5 +62,15 @@ export class TopicController {
     @UserLogado() userLogado: LoginPayload,
   ) {
     return await this.topicService.deleteById(+id, +userLogado.id);
+  }
+
+  @UsePipes(ValidationPipe)
+  @Patch('/:id')
+  async updateById(
+    @UserLogado() userLogado: LoginPayload,
+    @Param('id') id: number,
+    @Body() updateTopic: UpdateTopicDto,
+  ) {
+    return await this.topicService.updateById(+id, +userLogado.id, updateTopic);
   }
 }

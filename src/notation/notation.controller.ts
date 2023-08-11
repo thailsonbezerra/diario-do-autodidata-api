@@ -4,8 +4,11 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { NotationEntity } from './entity/notation.entity';
@@ -14,6 +17,7 @@ import { CreateNotationDto } from './dtos/createNotationDto';
 import { UserLogado } from 'src/decorators/user-logado.decorator';
 import { LoginPayload } from 'src/auth/dtos/loginPayload.dto';
 import { ReturnNotationDto } from './dtos/returnNotation.dto';
+import { UpdateNotationDto } from './dtos/updateNotationDto';
 
 @Controller('notation')
 @UseGuards(AuthGuard('jwt'))
@@ -58,5 +62,19 @@ export class NotationController {
     @Param('id') id: number,
   ) {
     return await this.notationService.deleteById(+id, +userLogado.id);
+  }
+
+  @UsePipes(ValidationPipe)
+  @Patch('/:id')
+  async updateById(
+    @UserLogado() userLogado: LoginPayload,
+    @Param('id') id: number,
+    @Body() updateNotation: UpdateNotationDto,
+  ) {
+    return await this.notationService.updateById(
+      +id,
+      +userLogado.id,
+      updateNotation,
+    );
   }
 }

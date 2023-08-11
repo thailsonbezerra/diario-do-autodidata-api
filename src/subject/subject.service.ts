@@ -6,6 +6,7 @@ import { CreateSubjectDto } from './dtos/createSubject.dto';
 import { UserService } from '../user/user.service';
 import { handleOptionalFilterDate } from '../utils/handleOptionalFilterDate';
 import { TopicService } from 'src/topic/topic.service';
+import { UpdateSubjectDto } from './dtos/updateSubjectdto';
 
 @Injectable()
 export class SubjectService {
@@ -102,5 +103,18 @@ export class SubjectService {
     await this.topicService.deleteBySubjectId(id, userId);
 
     return await this.subjectRepository.delete(id);
+  }
+
+  async updateById(
+    id: number,
+    userId: number,
+    updateSubject: UpdateSubjectDto,
+  ) {
+    await this.getById(id, userId);
+
+    return await this.subjectRepository.update(
+      { id },
+      { ...updateSubject, updatedAt: new Date() },
+    );
   }
 }

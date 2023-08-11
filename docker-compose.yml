@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres
+    image: postgres:14.2
     container_name: diado-do-autodidata-pg-container
     ports:
       - 8432:5432
@@ -10,3 +10,4 @@ services:
       - ./pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: 1234
+      TZ: 'America/Sao_Paulo'

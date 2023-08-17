@@ -22,4 +22,8 @@ export class CacheService {
 
     return data;
   }
+
+  async invalidateCache(key: string) {
+    await this.cacheManager.del(key);
+  }
 }

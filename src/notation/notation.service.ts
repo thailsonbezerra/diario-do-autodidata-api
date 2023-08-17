@@ -12,6 +12,7 @@ import { CreateNotationDto } from './dtos/createNotationDto';
 import { SubjectService } from 'src/subject/subject.service';
 import { TopicService } from 'src/topic/topic.service';
 import { UpdateNotationDto } from './dtos/updateNotationDto';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class NotationService {
@@ -21,33 +22,8 @@ export class NotationService {
     @Inject(forwardRef(() => TopicService))
     private readonly topicService: TopicService,
     private readonly subjectService: SubjectService,
+    private readonly cacheService: CacheService,
   ) {}
-
-  async createByTopicId(
-    createNotation: CreateNotationDto,
-    userId: number,
-  ): Promise<NotationEntity> {
-    const { topicId } = createNotation;
-
-    const { subjectId } = await this.topicService.getById(topicId, userId);
-    await this.subjectService.getById(subjectId, userId);
-
-    return await this.notationRepository.save(createNotation);
-  }
-
-  async deleteByTopicId(topicId: number, userId: number) {
-    const { subjectId } = await this.topicService.getById(topicId, userId);
-
-    await this.subjectService.getById(subjectId, userId);
-
-    const notations = await this.getAllNotationsByTopicId(topicId, userId);
-
-    for (const notation of notations) {
-      await this.notationRepository.delete({ id: notation.id });
-    }
-
-    return HttpStatus.OK;
-  }
 
   async getAllNotationsByTopicId(topicId: number, userId: number) {
     const notation = await this.notationRepository.find({
@@ -64,16 +40,20 @@ export class NotationService {
   }
 
   async getById(id: number, userId: number) {
-    const notation = await this.notationRepository.findOne({
-      where: { id },
-      relations: {
-        topic: {
-          subject: {
-            user: true,
+    const notation = await this.cacheService.getCache<NotationEntity>(
+      `notation_${id}`,
+      () =>
+        this.notationRepository.findOne({
+          where: { id },
+          relations: {
+            topic: {
+              subject: {
+                user: true,
+              },
+            },
           },
-        },
-      },
-    });
+        }),
+    );
 
     if (!notation) {
       throw new NotFoundException(`NotationId: ${id} Not Found`);
@@ -86,10 +66,20 @@ export class NotationService {
     return notation;
   }
 
-  async deleteById(id: number, userId: number) {
-    await this.getById(id, userId);
+  async createByTopicId(
+    createNotation: CreateNotationDto,
+    userId: number,
+  ): Promise<NotationEntity> {
+    const { topicId } = createNotation;
 
-    return await this.notationRepository.delete(id);
+    const { subjectId } = await this.topicService.getById(topicId, userId);
+    await this.subjectService.getById(subjectId, userId);
+
+    const notation = await this.notationRepository.save(createNotation);
+
+    await this.invalidateNotationCache(notation.id, userId);
+
+    return notation;
   }
 
   async updateById(
@@ -99,9 +89,42 @@ export class NotationService {
   ) {
     await this.getById(id, userId);
 
+    await this.invalidateNotationCache(id, userId);
+
     return await this.notationRepository.update(
       { id },
       { ...updateNotation, updatedAt: new Date() },
     );
+  }
+
+  async deleteByTopicId(topicId: number, userId: number) {
+    const { subjectId } = await this.topicService.getById(topicId, userId);
+
+    await this.subjectService.getById(subjectId, userId);
+
+    const notations = await this.getAllNotationsByTopicId(topicId, userId);
+
+    for (const { id: notationId } of notations) {
+      await this.invalidateNotationCache(notationId, userId);
+      await this.notationRepository.delete({ id: notationId });
+    }
+
+    return HttpStatus.OK;
+  }
+
+  async deleteById(id: number, userId: number) {
+    await this.getById(id, userId);
+
+    await this.invalidateNotationCache(id, userId);
+    return await this.notationRepository.delete(id);
+  }
+
+  async invalidateNotationCache(notationId: number, userId: number) {
+    const { topicId } = await this.getById(notationId, userId);
+    const { subjectId } = await this.topicService.getById(topicId, userId);
+
+    await this.cacheService.invalidateCache(`notation_${notationId}`);
+    await this.cacheService.invalidateCache(`topic_${topicId}`);
+    await this.cacheService.invalidateCache(`subject_${subjectId}`);
   }
 }

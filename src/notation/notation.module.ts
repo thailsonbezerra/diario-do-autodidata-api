@@ -5,12 +5,14 @@ import { NotationService } from './notation.service';
 import { NotationController } from './notation.controller';
 import { SubjectModule } from 'src/subject/subject.module';
 import { TopicModule } from 'src/topic/topic.module';
+import { CacheModule } from 'src/cache/cache.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([NotationEntity]),
     forwardRef(() => TopicModule),
     SubjectModule,
+    CacheModule,
   ],
   controllers: [NotationController],
   providers: [NotationService],

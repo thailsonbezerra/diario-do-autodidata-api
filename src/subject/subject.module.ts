@@ -6,6 +6,7 @@ import { SubjectEntity } from './entity/subject.entity';
 import { UserModule } from '../user/user.module';
 import { StatusSubjectModule } from '../status-subject/status-subject.module';
 import { TopicModule } from 'src/topic/topic.module';
+import { CacheModule } from 'src/cache/cache.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TopicModule } from 'src/topic/topic.module';
     TopicModule,
     UserModule,
     StatusSubjectModule,
+    CacheModule,
   ],
   controllers: [SubjectController],
   providers: [SubjectService],

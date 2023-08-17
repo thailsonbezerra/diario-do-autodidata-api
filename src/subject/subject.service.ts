@@ -7,6 +7,7 @@ import { UserService } from '../user/user.service';
 import { handleOptionalFilterDate } from '../utils/handleOptionalFilterDate';
 import { TopicService } from 'src/topic/topic.service';
 import { UpdateSubjectDto } from './dtos/updateSubjectdto';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class SubjectService {
@@ -15,20 +16,8 @@ export class SubjectService {
     private readonly subjectRepository: Repository<SubjectEntity>,
     private readonly userService: UserService,
     private readonly topicService: TopicService,
+    private readonly cacheService: CacheService,
   ) {}
-
-  async createByUserId(
-    createSubject: CreateSubjectDto,
-    statusId: number,
-    userId: number,
-  ): Promise<SubjectEntity> {
-    await this.userService.findUserById(userId);
-    return this.subjectRepository.save({
-      ...createSubject,
-      statusId,
-      userId,
-    });
-  }
 
   async getAllByUserId(
     userId: number,
@@ -59,18 +48,22 @@ export class SubjectService {
     subjectId: number,
     userId: number,
   ): Promise<SubjectEntity> {
-    const subject = await this.subjectRepository.findOne({
-      where: {
-        id: subjectId,
-        userId,
-      },
-      relations: {
-        topics: {
-          notations: true,
-        },
-        status: true,
-      },
-    });
+    const subject = await this.cacheService.getCache<SubjectEntity>(
+      `subject_${subjectId}`,
+      () =>
+        this.subjectRepository.findOne({
+          where: {
+            id: subjectId,
+            userId,
+          },
+          relations: {
+            topics: {
+              notations: true,
+            },
+            status: true,
+          },
+        }),
+    );
 
     if (!subject) {
       throw new NotFoundException(`SubjectId: ${subjectId} Not Found`);
@@ -97,12 +90,17 @@ export class SubjectService {
     return subject;
   }
 
-  async deleteById(id: number, userId: number) {
-    await this.getById(id, userId);
-
-    await this.topicService.deleteBySubjectId(id, userId);
-
-    return await this.subjectRepository.delete(id);
+  async createByUserId(
+    createSubject: CreateSubjectDto,
+    statusId: number,
+    userId: number,
+  ): Promise<SubjectEntity> {
+    await this.userService.findUserById(userId);
+    return this.subjectRepository.save({
+      ...createSubject,
+      statusId,
+      userId,
+    });
   }
 
   async updateById(
@@ -112,9 +110,35 @@ export class SubjectService {
   ) {
     await this.getById(id, userId);
 
+    await this.invalidateSubjectCache(id, userId);
+
     return await this.subjectRepository.update(
       { id },
       { ...updateSubject, updatedAt: new Date() },
     );
+  }
+
+  async deleteById(id: number, userId: number) {
+    await this.getById(id, userId);
+
+    await this.topicService.deleteBySubjectId(id, userId);
+
+    await this.invalidateSubjectCache(id, userId);
+
+    return await this.subjectRepository.delete(id);
+  }
+
+  async invalidateSubjectCache(subjectId: number, userId: number) {
+    const subject = await this.getByIdUsingRelations(subjectId, userId);
+    await this.cacheService.invalidateCache(`subject_${subjectId}`);
+
+    const topics = subject.topics;
+    for (const topic of topics) {
+      await this.cacheService.invalidateCache(`topic_${topic.id}`);
+      const notations = topic.notations;
+      for (const notation of notations) {
+        await this.cacheService.invalidateCache(`notation_${notation.id}`);
+      }
+    }
   }
 }

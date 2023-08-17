@@ -31,47 +31,25 @@ export class TopicService {
   ): Promise<TopicEntity[]> {
     await this.subjectService.getById(subjectId, userId);
 
-    return this.cacheService.getCache<TopicEntity[]>(
-      `subject_${subjectId}`,
-      () => this.topicRepository.find({ where: { subjectId } }),
-    );
-  }
-
-  async createBySubjectId(
-    createTopic: CreateTopicDto,
-    userId: number,
-  ): Promise<TopicEntity> {
-    const { subjectId } = createTopic;
-
-    await this.subjectService.getById(subjectId, userId);
-
-    return await this.topicRepository.save(createTopic);
-  }
-
-  async deleteBySubjectId(subjectId: number, userId: number) {
-    await this.subjectService.getById(subjectId, userId);
-
-    const topics = await this.getAllTopicsBySubjectId(subjectId, userId);
-
-    for (const topic of topics) {
-      await this.notationService.deleteByTopicId(topic.id, userId);
-    }
-
-    return await this.topicRepository.delete({ subjectId });
+    return this.topicRepository.find({ where: { subjectId } });
   }
 
   async getById(id: number, userId: number): Promise<TopicEntity> {
-    const topic = await this.topicRepository.findOne({
-      where: {
-        id,
-      },
-      relations: {
-        notations: true,
-        subject: {
-          user: true,
-        },
-      },
-    });
+    const topic = await this.cacheService.getCache<TopicEntity>(
+      `topic_${id}`,
+      () =>
+        this.topicRepository.findOne({
+          where: {
+            id,
+          },
+          relations: {
+            notations: true,
+            subject: {
+              user: true,
+            },
+          },
+        }),
+    );
 
     if (!topic) {
       throw new NotFoundException(`TopicId: ${id} Not Found`);
@@ -84,20 +62,67 @@ export class TopicService {
     return topic;
   }
 
-  async deleteById(id: number, userId: number) {
-    await this.getById(id, userId);
+  async createBySubjectId(
+    createTopic: CreateTopicDto,
+    userId: number,
+  ): Promise<TopicEntity> {
+    const { subjectId } = createTopic;
+    await this.subjectService.getById(subjectId, userId);
 
-    await this.notationService.deleteByTopicId(id, userId);
+    const topic = await this.topicRepository.save(createTopic);
 
-    return await this.topicRepository.delete(id);
+    await this.invalidateTopicCache(topic.id, userId);
+
+    return topic;
   }
 
   async updateById(id: number, userId: number, updateTopic: UpdateTopicDto) {
     await this.getById(id, userId);
 
+    await this.invalidateTopicCache(id, userId);
+
     return await this.topicRepository.update(
       { id },
       { ...updateTopic, updatedAt: new Date() },
     );
+  }
+
+  async deleteBySubjectId(subjectId: number, userId: number) {
+    await this.subjectService.getById(subjectId, userId);
+
+    const topics = await this.getAllTopicsBySubjectId(subjectId, userId);
+
+    for (const { id: topicId } of topics) {
+      await this.notationService.deleteByTopicId(topicId, userId);
+      await this.invalidateTopicCache(topicId, userId);
+    }
+
+    return await this.topicRepository.delete({ subjectId });
+  }
+
+  async deleteById(id: number, userId: number) {
+    await this.getById(id, userId);
+
+    await this.notationService.deleteByTopicId(id, userId);
+
+    await this.invalidateTopicCache(id, userId);
+
+    return await this.topicRepository.delete(id);
+  }
+
+  async invalidateTopicCache(topicId: number, userId: number) {
+    const { subjectId } = await this.getById(topicId, userId);
+
+    const notations = await this.notationService.getAllNotationsByTopicId(
+      topicId,
+      userId,
+    );
+
+    for (const { id: notationId } of notations) {
+      await this.cacheService.invalidateCache(`notation_${notationId}`);
+    }
+
+    await this.cacheService.invalidateCache(`topic_${topicId}`);
+    await this.cacheService.invalidateCache(`subject_${subjectId}`);
   }
 }

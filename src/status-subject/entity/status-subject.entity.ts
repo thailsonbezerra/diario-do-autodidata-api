@@ -1,4 +1,4 @@
-import { SubjectEntity } from 'src/subject/entity/subject.entity';
+import { SubjectEntity } from '../../subject/entity/subject.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'status_subject' })

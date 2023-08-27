@@ -14,8 +14,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { NotationEntity } from './entity/notation.entity';
 import { NotationService } from './notation.service';
 import { CreateNotationDto } from './dtos/createNotationDto';
-import { UserLogado } from 'src/decorators/user-logado.decorator';
-import { LoginPayload } from 'src/auth/dtos/loginPayload.dto';
+import { UserLogado } from '../decorators/user-logado.decorator';
+import { LoginPayload } from '../auth/dtos/loginPayload.dto';
 import { ReturnNotationDto } from './dtos/returnNotation.dto';
 import { UpdateNotationDto } from './dtos/updateNotationDto';
 

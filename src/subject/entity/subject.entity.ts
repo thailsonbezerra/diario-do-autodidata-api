@@ -1,4 +1,4 @@
-import { StatusSubjectEntity } from 'src/status-subject/entity/status-subject.entity';
+import { StatusSubjectEntity } from '../../status-subject/entity/status-subject.entity';
 import { TopicEntity } from '../../topic/entity/topic.entity';
 import { UserEntity } from '../../user/entity/user.entity';
 import {

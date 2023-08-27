@@ -9,10 +9,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotationEntity } from './entity/notation.entity';
 import { CreateNotationDto } from './dtos/createNotationDto';
-import { SubjectService } from 'src/subject/subject.service';
-import { TopicService } from 'src/topic/topic.service';
+import { SubjectService } from '../subject/subject.service';
+import { TopicService } from '../topic/topic.service';
 import { UpdateNotationDto } from './dtos/updateNotationDto';
-import { CacheService } from 'src/cache/cache.service';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class NotationService {

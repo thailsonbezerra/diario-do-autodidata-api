@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { CacheService } from '../cache/cache.service';
 import { CreateTopicDto } from './dtos/createTopicDto';
 import { SubjectService } from '../subject/subject.service';
-import { NotationService } from 'src/notation/notation.service';
+import { NotationService } from '../notation/notation.service';
 import { UpdateTopicDto } from './dtos/updateTopicDto';
 
 @Injectable()

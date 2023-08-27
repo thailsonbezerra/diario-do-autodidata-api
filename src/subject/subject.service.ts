@@ -5,9 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSubjectDto } from './dtos/createSubject.dto';
 import { UserService } from '../user/user.service';
 import { handleOptionalFilterDate } from '../utils/handleOptionalFilterDate';
-import { TopicService } from 'src/topic/topic.service';
+import { TopicService } from '../topic/topic.service';
 import { UpdateSubjectDto } from './dtos/updateSubjectdto';
-import { CacheService } from 'src/cache/cache.service';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class SubjectService {
@@ -21,9 +21,9 @@ export class SubjectService {
 
   async getAllByUserId(
     userId: number,
-    statusId: number,
-    dtInicio: string,
-    dtFim: string,
+    statusId?: number,
+    dtInicio?: string,
+    dtFim?: string,
   ): Promise<SubjectEntity[]> {
     const { dtInicioCondition, dtFimCondition } = handleOptionalFilterDate(
       dtInicio,

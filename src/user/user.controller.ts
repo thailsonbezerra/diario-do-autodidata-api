@@ -14,8 +14,8 @@ import { UserService } from './user.service';
 import { UserEntity } from './entity/user.entity';
 import { ReturnUserDto } from './dtos/returnUser.dto';
 import { UpdatePasswordDto } from './dtos/updatePassword.dto';
-import { UserLogado } from 'src/decorators/user-logado.decorator';
-import { LoginPayload } from 'src/auth/dtos/loginPayload.dto';
+import { UserLogado } from '../decorators/user-logado.decorator';
+import { LoginPayload } from '../auth/dtos/loginPayload.dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')

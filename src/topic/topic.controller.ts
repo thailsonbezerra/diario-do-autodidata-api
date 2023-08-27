@@ -14,8 +14,8 @@ import { TopicService } from './topic.service';
 import { TopicEntity } from './entity/topic.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateTopicDto } from './dtos/createTopicDto';
-import { UserLogado } from 'src/decorators/user-logado.decorator';
-import { LoginPayload } from 'src/auth/dtos/loginPayload.dto';
+import { UserLogado } from '../decorators/user-logado.decorator';
+import { LoginPayload } from '../auth/dtos/loginPayload.dto';
 import { ReturnTopicDto } from './dtos/returnTopic.dto';
 import { UpdateTopicDto } from './dtos/updateTopicDto';
 

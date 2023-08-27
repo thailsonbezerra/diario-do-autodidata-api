@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { SubjectEntity } from './entity/subject.entity';
 import { Raw, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -54,7 +59,6 @@ export class SubjectService {
         this.subjectRepository.findOne({
           where: {
             id: subjectId,
-            userId,
           },
           relations: {
             topics: {
@@ -66,8 +70,18 @@ export class SubjectService {
     );
 
     if (!subject) {
-      throw new NotFoundException(`SubjectId: ${subjectId} Not Found`);
+      throw new HttpException(
+        `Subject #${subjectId} Not Found`,
+        HttpStatus.NOT_FOUND,
+      );
     }
+
+    const isUser = subject.userId === userId;
+    if (!isUser)
+      throw new HttpException(
+        `User without access to subject #${subjectId}`,
+        HttpStatus.FORBIDDEN,
+      );
 
     return subject;
   }

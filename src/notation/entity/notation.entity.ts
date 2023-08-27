@@ -28,5 +28,5 @@ export class NotationEntity {
 
   @ManyToOne(() => TopicEntity, (topic) => topic.notations)
   @JoinColumn({ name: 'topic_id', referencedColumnName: 'id' })
-  topic: TopicEntity;
+  topic?: TopicEntity;
 }

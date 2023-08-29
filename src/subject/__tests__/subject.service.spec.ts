@@ -124,23 +124,32 @@ describe('SubjectService', () => {
   });
 
   describe('getByIdUsingRelations()', () => {
+    const subjectId = 1;
+    let userId = 1;
     it('should return subject', async () => {
-      const subject = await service.getByIdUsingRelations(1, 1);
+      const subject = await service.getByIdUsingRelations(subjectId, userId);
 
       expect(subject).toEqual(subjectRelationsMock);
+    });
+
+    it('should return error db exception', async () => {
+      jest.spyOn(repository, 'findOne').mockRejectedValue(new Error());
+
+      expect(service.getById(subjectId, userId)).rejects.toThrowError();
     });
 
     it('should throw NotFoundException when subject is not found', async () => {
       jest.spyOn(repository, 'findOne').mockReturnValue(undefined);
 
-      await expect(service.getById(1, 1)).rejects.toThrow(
-        `SubjectId: ${1} Not Found`,
+      await expect(service.getById(subjectId, userId)).rejects.toThrow(
+        `SubjectId: ${subjectId} Not Found`,
       );
     });
 
     it('should throw forbidden when the subject is not for the user', async () => {
-      await expect(service.getById(1, 2)).rejects.toThrow(
-        `Subject Not Found by SubjectId: ${1} for that user`,
+      userId = 2;
+      await expect(service.getById(subjectId, userId)).rejects.toThrow(
+        `Subject Not Found by SubjectId: ${subjectId} for that user`,
       );
     });
   });

@@ -9,10 +9,12 @@ import { TopicService } from '../../topic/topic.service';
 import { CacheService } from '../../cache/cache.service';
 import { subjectRelationsMock } from '../__mocks__/subject-relations.mock';
 import * as handleOptionalFilterDateModule from '../../utils/handleOptionalFilterDate';
+import { userEntityMock } from '../../user/__mocks__/user.mock';
 
 describe('SubjectService', () => {
   let service: SubjectService;
   let repository: Repository<SubjectEntity>;
+  let userService: UserService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,7 +31,7 @@ describe('SubjectService', () => {
         {
           provide: UserService,
           useValue: {
-            findUserById: jest.fn(),
+            findUserById: jest.fn().mockReturnValue(userEntityMock),
           },
         },
         {
@@ -51,6 +53,7 @@ describe('SubjectService', () => {
     repository = module.get<Repository<SubjectEntity>>(
       getRepositoryToken(SubjectEntity),
     );
+    userService = module.get<UserService>(UserService);
   });
 
   it('should be defined', () => {
@@ -194,6 +197,59 @@ describe('SubjectService', () => {
       await expect(
         service.getById(subjectId, unauthorizedUserId),
       ).rejects.toThrow(`User without access to subject #${subjectId}`);
+    });
+  });
+
+  describe('createByUserId()', () => {
+    const userId = 1;
+    const statusId = 1;
+    const createSubjectData = {
+      name: 'name teste subject',
+      description: 'description teste subject',
+    };
+
+    it('should create and return a subject', async () => {
+      const createdSubject = await service.createByUserId(
+        createSubjectData,
+        statusId,
+        userId,
+      );
+
+      expect(createdSubject).toEqual(subjectEntityMock[0]);
+    });
+
+    it('should return error db exception', async () => {
+      const error = new Error('Database error');
+      jest.spyOn(repository, 'save').mockRejectedValue(error);
+
+      await expect(
+        service.createByUserId(createSubjectData, statusId, userId),
+      ).rejects.toThrow(error);
+    });
+
+    it('should call userService.findUserById with correct userId', async () => {
+      await service.createByUserId(createSubjectData, statusId, userId);
+
+      expect(userService.findUserById).toHaveBeenCalledWith(userId);
+      expect(userService.findUserById).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call subjectRepository.save with correct data', async () => {
+      await service.createByUserId(createSubjectData, statusId, userId);
+
+      expect(repository.save).toHaveBeenCalledWith({
+        ...createSubjectData,
+        statusId,
+        userId,
+      });
+    });
+
+    it('should throw an error when userService.findUserById throws an error', async () => {
+      jest.spyOn(userService, 'findUserById').mockRejectedValue(new Error());
+
+      await expect(
+        service.createByUserId(createSubjectData, statusId, userId),
+      ).rejects.toThrow();
     });
   });
 });

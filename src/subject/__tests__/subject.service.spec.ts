@@ -21,9 +21,9 @@ describe('SubjectService', () => {
         {
           provide: getRepositoryToken(SubjectEntity),
           useValue: {
-            save: jest.fn().mockReturnValue(subjectEntityMock),
-            find: jest.fn().mockReturnValue([subjectEntityMock]),
-            findOne: jest.fn().mockReturnValue(subjectRelationsMock),
+            save: jest.fn().mockReturnValue(subjectEntityMock[0]),
+            find: jest.fn().mockReturnValue(subjectEntityMock),
+            findOne: jest.fn().mockReturnValue(subjectEntityMock[0]),
           },
         },
         {
@@ -67,7 +67,7 @@ describe('SubjectService', () => {
     it('should return list of subjects', async () => {
       const subjects = await service.getAllByUserId(userId);
 
-      expect(subjects).toEqual([subjectEntityMock]);
+      expect(subjects).toEqual(subjectEntityMock);
     });
 
     it('should return error db exception', async () => {
@@ -125,8 +125,9 @@ describe('SubjectService', () => {
 
   describe('getByIdUsingRelations()', () => {
     const subjectId = 1;
-    let userId = 1;
+    const userId = 1;
     it('should return subject', async () => {
+      jest.spyOn(repository, 'findOne').mockResolvedValue(subjectRelationsMock);
       const subject = await service.getByIdUsingRelations(subjectId, userId);
 
       expect(subject).toEqual(subjectRelationsMock);
@@ -143,17 +144,55 @@ describe('SubjectService', () => {
     });
 
     it('should throw NotFoundException when subject is not found', async () => {
+      const nonExistentSubjectId = 100;
+
       jest.spyOn(repository, 'findOne').mockReturnValue(undefined);
 
       await expect(
-        service.getByIdUsingRelations(subjectId, userId),
-      ).rejects.toThrow(`Subject #${subjectId} Not Found`);
+        service.getByIdUsingRelations(nonExistentSubjectId, userId),
+      ).rejects.toThrow(`Subject #${nonExistentSubjectId} Not Found`);
     });
 
     it('should throw forbidden when the subject is not for the user', async () => {
-      userId = 2;
+      const unauthorizedUserId = 2;
       await expect(
-        service.getByIdUsingRelations(subjectId, userId),
+        service.getByIdUsingRelations(subjectId, unauthorizedUserId),
+      ).rejects.toThrow(`User without access to subject #${subjectId}`);
+    });
+  });
+
+  describe('getById()', () => {
+    const subjectId = 1;
+    const userId = 1;
+    it('should return subject', async () => {
+      const subject = await service.getById(subjectId, userId);
+
+      expect(subject).toEqual(subjectEntityMock[0]);
+    });
+
+    it('should return error db exception', async () => {
+      jest
+        .spyOn(repository, 'findOne')
+        .mockRejectedValue(new Error('Database Error'));
+
+      expect(service.getById(subjectId, userId)).rejects.toThrow(
+        'Database Error',
+      );
+    });
+
+    it('should throw NotFoundException when subject is not found', async () => {
+      const nonExistentSubjectId = 100;
+      jest.spyOn(repository, 'findOne').mockReturnValue(undefined);
+
+      await expect(
+        service.getById(nonExistentSubjectId, userId),
+      ).rejects.toThrow(`Subject #${nonExistentSubjectId} Not Found`);
+    });
+
+    it('should throw forbidden when the subject is not for the user', async () => {
+      const unauthorizedUserId = 2;
+      await expect(
+        service.getById(subjectId, unauthorizedUserId),
       ).rejects.toThrow(`User without access to subject #${subjectId}`);
     });
   });

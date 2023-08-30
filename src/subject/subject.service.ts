@@ -93,12 +93,15 @@ export class SubjectService {
       },
     });
 
-    if (!subject) throw new NotFoundException(`SubjectId: ${id} Not Found`);
+    if (!subject) {
+      throw new HttpException(`Subject #${id} Not Found`, HttpStatus.NOT_FOUND);
+    }
 
     const isUser = subject.userId === userId;
     if (!isUser)
-      throw new NotFoundException(
-        `Subject Not Found by SubjectId: ${id} for that user`,
+      throw new HttpException(
+        `User without access to subject #${id}`,
+        HttpStatus.FORBIDDEN,
       );
 
     return subject;

@@ -41,7 +41,7 @@ describe('SubjectService', () => {
         {
           provide: CacheService,
           useValue: {
-            getCache: jest.fn(() => subjectRelationsMock),
+            getCache: jest.fn((key, functionRequest) => functionRequest()),
           },
         },
       ],
@@ -133,24 +133,28 @@ describe('SubjectService', () => {
     });
 
     it('should return error db exception', async () => {
-      jest.spyOn(repository, 'findOne').mockRejectedValue(new Error());
+      jest
+        .spyOn(repository, 'findOne')
+        .mockRejectedValue(new Error('Database Error'));
 
-      expect(service.getById(subjectId, userId)).rejects.toThrowError();
+      expect(service.getByIdUsingRelations(subjectId, userId)).rejects.toThrow(
+        'Database Error',
+      );
     });
 
     it('should throw NotFoundException when subject is not found', async () => {
       jest.spyOn(repository, 'findOne').mockReturnValue(undefined);
 
-      await expect(service.getById(subjectId, userId)).rejects.toThrow(
-        `SubjectId: ${subjectId} Not Found`,
-      );
+      await expect(
+        service.getByIdUsingRelations(subjectId, userId),
+      ).rejects.toThrow(`Subject #${subjectId} Not Found`);
     });
 
     it('should throw forbidden when the subject is not for the user', async () => {
       userId = 2;
-      await expect(service.getById(subjectId, userId)).rejects.toThrow(
-        `Subject Not Found by SubjectId: ${subjectId} for that user`,
-      );
+      await expect(
+        service.getByIdUsingRelations(subjectId, userId),
+      ).rejects.toThrow(`User without access to subject #${subjectId}`);
     });
   });
 });

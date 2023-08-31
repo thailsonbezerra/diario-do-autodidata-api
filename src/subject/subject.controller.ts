@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
+  Put,
   Query,
   UseGuards,
   UsePipes,
@@ -19,6 +19,7 @@ import { UserLogado } from '../decorators/user-logado.decorator';
 import { LoginPayload } from '../auth/dtos/loginPayload.dto';
 import { returnAllFromSubject } from './dtos/returnAllFromSubject';
 import { UpdateSubjectDto } from './dtos/updateSubjectdto';
+import { ReturnSubjectUpdatedDto } from './dtos/returnSubjectUpdated.dto';
 
 const STATUS_SUBJECT_INICIAL = 1;
 
@@ -80,16 +81,18 @@ export class SubjectController {
   }
 
   @UsePipes(ValidationPipe)
-  @Patch('/:id')
+  @Put('/:id')
   async updateById(
     @UserLogado() userLogado: LoginPayload,
     @Param('id') id: number,
     @Body() updateSubjectDto: UpdateSubjectDto,
   ) {
-    return await this.subjectService.updateById(
+    const subject = await this.subjectService.updateById(
       +id,
       +userLogado.id,
       updateSubjectDto,
     );
+
+    return new ReturnSubjectUpdatedDto(subject);
   }
 }

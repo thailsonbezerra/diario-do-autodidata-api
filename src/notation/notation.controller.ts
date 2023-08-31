@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -18,6 +18,7 @@ import { UserLogado } from '../decorators/user-logado.decorator';
 import { LoginPayload } from '../auth/dtos/loginPayload.dto';
 import { ReturnNotationDto } from './dtos/returnNotation.dto';
 import { UpdateNotationDto } from './dtos/updateNotationDto';
+import { ReturnNotationUpdatedDto } from './dtos/returnNotationUpdated.dto';
 
 @Controller('notation')
 @UseGuards(AuthGuard('jwt'))
@@ -65,16 +66,18 @@ export class NotationController {
   }
 
   @UsePipes(ValidationPipe)
-  @Patch('/:id')
+  @Put('/:id')
   async updateById(
     @UserLogado() userLogado: LoginPayload,
     @Param('id') id: number,
     @Body() updateNotation: UpdateNotationDto,
   ) {
-    return await this.notationService.updateById(
+    const notation = await this.notationService.updateById(
       +id,
       +userLogado.id,
       updateNotation,
     );
+
+    return new ReturnNotationUpdatedDto(notation);
   }
 }

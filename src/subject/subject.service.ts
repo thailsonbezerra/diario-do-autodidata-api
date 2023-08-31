@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SubjectEntity } from './entity/subject.entity';
 import { Raw, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -125,14 +120,14 @@ export class SubjectService {
     userId: number,
     updateSubject: UpdateSubjectDto,
   ) {
-    await this.getById(id, userId);
+    const subject = await this.getById(id, userId);
 
     await this.invalidateSubjectCache(id, userId);
 
-    return await this.subjectRepository.update(
-      { id },
-      { ...updateSubject, updatedAt: new Date() },
-    );
+    const updateSubjectData = { ...updateSubject, updatedAt: new Date() };
+
+    this.subjectRepository.merge(subject, updateSubjectData);
+    return await this.subjectRepository.save(subject);
   }
 
   async deleteById(id: number, userId: number) {

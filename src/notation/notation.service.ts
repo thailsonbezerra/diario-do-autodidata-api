@@ -87,14 +87,14 @@ export class NotationService {
     userId: number,
     updateNotation: UpdateNotationDto,
   ) {
-    await this.getById(id, userId);
+    const notation = await this.getById(id, userId);
 
     await this.invalidateNotationCache(id, userId);
 
-    return await this.notationRepository.update(
-      { id },
-      { ...updateNotation, updatedAt: new Date() },
-    );
+    const updateNotationData = { ...updateNotation, updatedAt: new Date() };
+    this.notationRepository.merge(notation, updateNotationData);
+
+    return await this.notationRepository.save(notation);
   }
 
   async deleteByTopicId(topicId: number, userId: number) {

@@ -77,14 +77,14 @@ export class TopicService {
   }
 
   async updateById(id: number, userId: number, updateTopic: UpdateTopicDto) {
-    await this.getById(id, userId);
+    const topic = await this.getById(id, userId);
 
     await this.invalidateTopicCache(id, userId);
 
-    return await this.topicRepository.update(
-      { id },
-      { ...updateTopic, updatedAt: new Date() },
-    );
+    const updateTopicData = { ...updateTopic, updatedAt: new Date() };
+    this.topicRepository.merge(topic, updateTopicData);
+
+    return await this.topicRepository.save(topic);
   }
 
   async deleteBySubjectId(subjectId: number, userId: number) {

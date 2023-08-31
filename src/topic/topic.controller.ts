@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -18,6 +18,7 @@ import { UserLogado } from '../decorators/user-logado.decorator';
 import { LoginPayload } from '../auth/dtos/loginPayload.dto';
 import { ReturnTopicDto } from './dtos/returnTopic.dto';
 import { UpdateTopicDto } from './dtos/updateTopicDto';
+import { ReturnTopicUpdatedDto } from './dtos/returnTopicUpdated.dto';
 
 @Controller('topic')
 @UseGuards(AuthGuard('jwt'))
@@ -65,12 +66,18 @@ export class TopicController {
   }
 
   @UsePipes(ValidationPipe)
-  @Patch('/:id')
+  @Put('/:id')
   async updateById(
     @UserLogado() userLogado: LoginPayload,
     @Param('id') id: number,
     @Body() updateTopic: UpdateTopicDto,
   ) {
-    return await this.topicService.updateById(+id, +userLogado.id, updateTopic);
+    const topic = await this.topicService.updateById(
+      +id,
+      +userLogado.id,
+      updateTopic,
+    );
+
+    return new ReturnTopicUpdatedDto(topic);
   }
 }
